@@ -1,0 +1,27 @@
+#compdef task
+
+# Listing commands from Taskfile.yml
+function __list() {
+    local -a scripts
+
+    if [ -f Taskfile.yml ]; then
+        tasks=$(task -l | sed -En "s/^\* ([^[:space:]]+):[[:space:]]+(.+)$/\1 \2/p" | awk '{gsub(/:/,"\\:",$1)} 1' | awk "{ st = index(\$0,\" \"); print \$1 \":\" substr(\$0,st+1)}")
+        scripts=("${(@f)$(echo $tasks)}")
+        _describe 'script' scripts
+    fi
+}
+
+
+function __apps() {
+    local -a scripts
+    apps=$(find app -maxdepth 1 -mindepth 1 -type d -print)
+    scripts=("${(@f)$(echo $apps)}")
+    _describe 'script' scripts
+}
+
+
+
+_arguments \
+    '*--: :__apps' \
+    '*: :__list' 
+
